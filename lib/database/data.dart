@@ -77,7 +77,6 @@ class DatabaseService {
   }
 
   Future<int> createItem(WorkshopEntity workshopEntity) async {
-    int result = 0;
     final Database db = await initializeDB();
     final id = await db.insert('workshop', workshopEntity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -86,15 +85,23 @@ class DatabaseService {
   }
 
   Future<int> createSubscription(SubscriptionEntity subscriptionEntity) async {
-    int result = 0;
     final Database db = await initializeDB();
     final id = await db.insert('subscription', subscriptionEntity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     return id;
   }
 
+  Future<int> deleteWorkshop(int workshopId) async {
+    final Database db = await initializeDB();
+    final id = await db.delete(
+      'workshop',
+      where: 'id = ?',
+      whereArgs: [workshopId],
+    );
+    return id;
+  }
+
   Future<int> createLesson(LessonEntity lessonEntity) async {
-    int result = 0;
     final Database db = await initializeDB();
     final id = await db.insert('lesson', lessonEntity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);

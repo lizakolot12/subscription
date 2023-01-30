@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mits.subscript.subscription">
    <application
-        android:label="subscription"
+        android:label="Мої абонементи"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

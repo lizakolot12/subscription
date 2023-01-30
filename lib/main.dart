@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:subscription/create.dart';
+import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
+
+import 'model/workshop.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,21 +12,11 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Абонементи'),
@@ -33,16 +26,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -50,10 +33,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // List<Workshop> workshop = List.empty();
 
   void _openCreatePage() {
-   /* setState(() {
+    /* setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -64,15 +47,27 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(_createRoute());
   }
 
+/* void _loadData() {
+
+      Repo().getAll().then((value) => {
+        workshop = value;
+        setState();}
+      );
+
+
+  }*/
+
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => const CreatePage(),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const CreatePage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
         const curve = Curves.ease;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -84,43 +79,130 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var all = Repo().getAll();
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(widget.title),
       ),
-      body:  ListView.builder(
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return Card(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(padding:  const EdgeInsets.all(16.0), child: Text(all[index].name, textAlign: TextAlign.start))
-                ,
-                Text(all[index].subscriptions[0].detail),
-                Row(children: [
-                  const Text("з"),
-                  Text(all[index].subscriptions[0].startDate.toIso8601String())
-                ]),
-                Row(children: [
-                  const Text("по"),
-                  Text(all[index]
-                      .subscriptions[0]
-                      .endDate
-                      .toLocal()
-                      .toIso8601String())
-                ]),
-              ],
-            ),
-          );
+      body: FutureBuilder<List<Workshop>>(
+        future: Repo().getAll(),
+        initialData: List.empty(),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (context, index) {
+                    var item = snapshot.data?.toList()[index];
+                    var activeSubscription =
+                        (item?.subscriptions.length ?? 0) > 0
+                            ? item?.subscriptions[0]
+                            : null;
+                    return Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(item?.name ?? "",
+                                        textAlign: TextAlign.start)),
+                                moreButton(activeSubscription)
+                              ]),
+                          Text(activeSubscription?.detail ?? ""),
+                          Row(children: [
+                            const Text("з"),
+                            Text(activeSubscription?.startDate
+                                    .toIso8601String() ??
+                                "")
+                          ]),
+                          Row(children: [
+                            const Text("по"),
+                            Text(activeSubscription?.endDate
+                                    .toLocal()
+                                    .toIso8601String() ??
+                                "")
+                          ]),
+                        ],
+                      ),
+                    );
+                  },
+                ).build(context)
+              : const Center(
+                  child: CircularProgressIndicator(),
+                );
         },
-      ).build(context),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreatePage,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+    );
+  }
+
+  Widget moreButton(Subscription? subscription) {
+    return PopupMenuButton<int>(
+      itemBuilder: (context) => [
+        // PopupMenuItem 1
+        PopupMenuItem(
+          value: 1,
+          // row with 2 children
+          child: Row(
+            children: const [
+              Icon(Icons.check),
+              SizedBox(
+                width: 10,
+              ),
+              Text("Відвідано заняття")
+            ],
+          ),
+        ),
+        // PopupMenuItem 2
+        PopupMenuItem(
+          value: 2,
+          // row with two children
+          child: Row(
+            children: const [
+              Icon(Icons.copy),
+              SizedBox(
+                width: 10,
+              ),
+              Text("Копія абонементу")
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 3,
+          // row with two children
+          child: Row(
+            children: const [
+              Icon(Icons.delete),
+              SizedBox(
+                width: 10,
+              ),
+              Text("Видалити")
+            ],
+          ),
+        )
+      ],
+      offset: const Offset(0, 100),
+      color: Colors.grey,
+      elevation: 2,
+      // on selected we show the dialog box
+      onSelected: (value) {
+        // if value 1 show dialog
+        if (value == 1) {
+          Repo().createLesson(
+              subscription?.workshopId ?? -1, DateTime.now().toString());
+        } else if (value == 2) {
+          Repo().createSubscription(subscription?.workshopId ?? -1,
+              "${subscription?.detail}_copy", subscription?.lessonNumbers ?? 8);
+        } else if (value == 3) {
+          Repo().deleteWorkshop(subscription?.workshopId ?? -1);
+        }
+      },
     );
   }
 }

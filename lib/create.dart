@@ -11,6 +11,9 @@ class CreatePage extends StatefulWidget {
 class _CreatePageState extends State<CreatePage> {
   String _startDate = '';
   String _endDate = '';
+  final _nameController = TextEditingController();
+  final _labelController = TextEditingController();
+  final _numberController = TextEditingController();
 
   void _setStartDate(String startDate) {
     setState(() {
@@ -38,20 +41,23 @@ class _CreatePageState extends State<CreatePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
                       border: InputBorder.none,
                       labelText: 'Назва',
                       hintText: 'Введіть назву'),
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _labelController,
+                  decoration: const InputDecoration(
                       border: InputBorder.none,
                       labelText: 'Мітка',
                       hintText: ''),
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: _numberController,
+                  decoration: const InputDecoration(
                       border: InputBorder.none,
                       labelText: 'Заплановано занять',
                       hintText: '0'),
@@ -85,17 +91,20 @@ class _CreatePageState extends State<CreatePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(onSurface: Colors.pinkAccent),
-
-                    onPressed: (){
-                      var repo = Repo();
-                      repo.create();
-                    },
-                    child: Text('Зберегти'),
-                  )
-                ],)
-
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          onSurface: Colors.pinkAccent),
+                      onPressed: () {
+                        var repo = Repo();
+                        repo.createWorkshop(
+                            _nameController.text,
+                            _labelController.text,
+                            int.parse(_numberController.text));
+                      },
+                      child: Text('Зберегти'),
+                    )
+                  ],
+                )
               ],
             ),
           );
