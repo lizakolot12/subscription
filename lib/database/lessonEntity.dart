@@ -6,9 +6,11 @@ class LessonEntity {
     int subscriptionId;
 
     LessonEntity(
+    //{
+       // required this.lId,
         //required this.lId,
         // this.description,
-        this.date,  this.subscriptionId);
+       this.date, this.subscriptionId);
 
     LessonEntity.fromMap(Map<String, dynamic> item):
             lId=item["id"],

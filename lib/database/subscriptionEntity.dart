@@ -6,7 +6,8 @@ class SubscriptionEntity {
   int lessonNumbers;
   int workshopId;
 
-  SubscriptionEntity(this.detail,
+  SubscriptionEntity(
+      this.detail,
       //this.startDate, this.endDate,
       this.lessonNumbers,  this.workshopId);
 

@@ -11,4 +11,9 @@ class Subscription {
 
   Subscription(this.id, this.detail, this.startDate, this.endDate,
       this.lessonNumbers, this.lessons, this.workshopId);
+
+  @override
+  String toString() {
+    return "Subscription : $id $detail $startDate $endDate $lessonNumbers $lessons $workshopId";
+  }
 }
