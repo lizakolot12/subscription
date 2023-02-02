@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:subscription/create.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
@@ -33,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // List<Workshop> workshop = List.empty();
+  Subscription? _active = null;
 
   void _openCreatePage() {
     /* setState(() {
@@ -47,15 +48,15 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(_createRoute());
   }
 
-/* void _loadData() {
+  void setActive(Subscription subscription) {
+    setState(() {
+      _active = subscription;
+    });
+  }
 
-      Repo().getAll().then((value) => {
-        workshop = value;
-        setState();}
-      );
-
-
-  }*/
+  void _loadData() {
+    setState(() {});
+  }
 
   Route _createRoute() {
     return PageRouteBuilder(
@@ -79,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var format = DateFormat("dd-MM-yyyy"); //.format(YOUR_DATETIME_HERE)
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -93,10 +95,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
                     var item = snapshot.data?.toList()[index];
-                    var activeSubscription =
-                        (item?.subscriptions.length ?? 0) > 0
-                            ? item?.subscriptions[0]
-                            : null;
+                    _active ??= (item?.subscriptions.length ?? 0) > 0
+                          ? item?.subscriptions[0]
+                          : null;
+                    var lessonNow = _active?.lessons.length ?? 0;
+                    var lessonPlan = _active?.lessonNumbers ?? 0;
+                    var numberColor = Colors.black.withOpacity(1.0);
+                    if ((lessonPlan - lessonNow) <= 2) {
+                      numberColor = Colors.red;
+                    }
                     return Card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,26 +111,67 @@ class _MyHomePageState extends State<MyHomePage> {
                           Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text(item?.name ?? "",
-                                        textAlign: TextAlign.start)),
-                                moreButton(activeSubscription)
+                                Expanded(
+                                  flex: 60,
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Text(item?.name ?? "",
+                                          textAlign: TextAlign.start)),
+                                ),
+                                Expanded(
+                                    flex: 30,
+                                    child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 8.0),
+                                        child: Text(
+                                            (_active?.lessons.length ?? 0)
+                                                    .toString() +
+                                                " з " +
+                                                (_active?.lessonNumbers ?? 0)
+                                                    .toString(),
+                                            style: TextStyle(
+                                                color: numberColor)))),
+                                Expanded(flex: 10, child: moreButton(_active))
                               ]),
-                          Text(activeSubscription?.detail ?? ""),
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 2.0),
+                              child: Text(
+                                _active?.detail ?? "",
+                                style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              )),
                           Row(children: [
-                            const Text("з"),
-                            Text(activeSubscription?.startDate
-                                    .toIso8601String() ??
-                                "")
+                            const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text("з")),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text(format.format(
+                                    _active?.startDate ?? DateTime.now())))
                           ]),
                           Row(children: [
-                            const Text("по"),
-                            Text(activeSubscription?.endDate
-                                    .toLocal()
-                                    .toIso8601String() ??
-                                "")
+                            const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text("по")),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 8.0),
+                                child: Text(format.format(
+                                    _active?.endDate ?? DateTime.now())))
                           ]),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                                children: smallSubscriptions(
+                                    item?.subscriptions ?? List.empty(),
+                                    _active)),
+                          ),
                         ],
                       ),
                     );
@@ -196,13 +244,71 @@ class _MyHomePageState extends State<MyHomePage> {
         if (value == 1) {
           Repo().createLesson(
               subscription?.workshopId ?? -1, DateTime.now().toString());
+          _loadData();
         } else if (value == 2) {
           Repo().createSubscription(subscription?.workshopId ?? -1,
               "${subscription?.detail}_copy", subscription?.lessonNumbers ?? 8);
+          _loadData();
         } else if (value == 3) {
           Repo().deleteWorkshop(subscription?.workshopId ?? -1);
+          _loadData();
         }
       },
     );
+  }
+
+  List<Widget> smallSubscriptions(
+      List<Subscription> subscriptions, Subscription? active) {
+    List<Widget> smallSubscriptions = [];
+    for (Subscription subscription in subscriptions) {
+      smallSubscriptions
+          .add(smallSubscription(subscription, subscription.id == active?.id));
+    }
+    return smallSubscriptions;
+  }
+
+  Widget smallSubscription(Subscription subscription, bool active) {
+    var numberColor = Colors.black.withOpacity(1.0);
+    if ((subscription.lessonNumbers - subscription.lessons.length) <= 2) {
+      numberColor = Colors.red;
+    }
+    var shape = RoundedRectangleBorder(
+      side: const BorderSide(
+        color: Colors.transparent,
+      ),
+      borderRadius: BorderRadius.circular(15.0),
+    );
+    var elevation = 2.0;
+    if (active) {
+      shape = RoundedRectangleBorder(
+        side: const BorderSide(
+          color: Colors.cyan,
+        ),
+        borderRadius: BorderRadius.circular(15.0),
+      );
+      elevation = 8.0;
+    }
+    return Card(
+        child: GestureDetector(
+            onTap: () {
+              setActive(subscription);
+            },
+            child: Row(
+              children: [
+                Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(subscription.detail)),
+                Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Text(
+                        (subscription.lessons.length).toString() +
+                            " з " +
+                            (subscription.lessonNumbers).toString(),
+                        style: TextStyle(color: numberColor)))
+              ],
+            )),
+        elevation: elevation,
+        borderOnForeground: true,
+        shape: shape);
   }
 }
