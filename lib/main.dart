@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:subscription/create.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
+import 'package:subscription/view_model.dart';
 
 import 'model/workshop.dart';
 
@@ -34,28 +35,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Subscription? _active = null;
+  final ListViewModel _listViewModel = ListViewModel(Repo());
 
   void _openCreatePage() {
-    /* setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });*/
     Navigator.of(context).push(_createRoute());
   }
 
-  void setActive(Subscription subscription) {
+  void setActive(WorkshopView workshopView, Subscription subscription) {
     setState(() {
-      _active = subscription;
+      _listViewModel.setActive(workshopView, subscription);
     });
   }
 
   void _loadData() {
-    setState(() {});
+    setState(() {
+
+    });
   }
 
   Route _createRoute() {
@@ -86,8 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: Text(widget.title),
       ),
-      body: FutureBuilder<List<Workshop>>(
-        future: Repo().getAll(),
+      body: FutureBuilder<List<WorkshopView>>(
+        future: _listViewModel.getAll(),
         initialData: List.empty(),
         builder: (context, snapshot) {
           return snapshot.hasData
@@ -95,11 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
                     var item = snapshot.data?.toList()[index];
-                    _active ??= (item?.subscriptions.length ?? 0) > 0
-                          ? item?.subscriptions[0]
-                          : null;
-                    var lessonNow = _active?.lessons.length ?? 0;
-                    var lessonPlan = _active?.lessonNumbers ?? 0;
+                    var active = item?.active;
+                    var lessonNow = active?.lessons.length ?? 0;
+                    var lessonPlan = active?.lessonNumbers ?? 0;
                     var numberColor = Colors.black.withOpacity(1.0);
                     if ((lessonPlan - lessonNow) <= 2) {
                       numberColor = Colors.red;
@@ -115,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   flex: 60,
                                   child: Padding(
                                       padding: const EdgeInsets.all(16.0),
-                                      child: Text(item?.name ?? "",
+                                      child: Text(item?.workshop.name ?? "",
                                           textAlign: TextAlign.start)),
                                 ),
                                 Expanded(
@@ -124,20 +117,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8.0, vertical: 8.0),
                                         child: Text(
-                                            (_active?.lessons.length ?? 0)
+                                            (active?.lessons.length ?? 0)
                                                     .toString() +
                                                 " з " +
-                                                (_active?.lessonNumbers ?? 0)
+                                                (active?.lessonNumbers ?? 0)
                                                     .toString(),
                                             style: TextStyle(
                                                 color: numberColor)))),
-                                Expanded(flex: 10, child: moreButton(_active))
+                                Expanded(flex: 10, child: moreButton(item!))
                               ]),
                           Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16.0, vertical: 2.0),
                               child: Text(
-                                _active?.detail ?? "",
+                                active?.detail ?? "",
                                 style: TextStyle(
                                     color: Colors.grey[800],
                                     fontWeight: FontWeight.bold,
@@ -152,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16.0, vertical: 8.0),
                                 child: Text(format.format(
-                                    _active?.startDate ?? DateTime.now())))
+                                    active?.startDate ?? DateTime.now())))
                           ]),
                           Row(children: [
                             const Padding(
@@ -162,15 +155,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0, vertical: 8.0),
-                                child: Text(format.format(
-                                    _active?.endDate ?? DateTime.now())))
+                                child: Text(format
+                                    .format(active?.endDate ?? DateTime.now())))
                           ]),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: smallSubscriptions(
-                                    item?.subscriptions ?? List.empty(),
-                                    _active)),
+                            child: Row(children: smallSubscriptions(item!)),
                           ),
                         ],
                       ),
@@ -190,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget moreButton(Subscription? subscription) {
+  Widget moreButton(WorkshopView workshopView) {
     return PopupMenuButton<int>(
       itemBuilder: (context) => [
         // PopupMenuItem 1
@@ -242,32 +232,29 @@ class _MyHomePageState extends State<MyHomePage> {
       onSelected: (value) {
         // if value 1 show dialog
         if (value == 1) {
-          Repo().createLesson(
-              subscription?.workshopId ?? -1, DateTime.now().toString());
+          _listViewModel.addLesson(workshopView.active);
           _loadData();
         } else if (value == 2) {
-          Repo().createSubscription(subscription?.workshopId ?? -1,
-              "${subscription?.detail}_copy", subscription?.lessonNumbers ?? 8);
+          _listViewModel.copy(workshopView);
           _loadData();
         } else if (value == 3) {
-          Repo().deleteWorkshop(subscription?.workshopId ?? -1);
+          _listViewModel.deleteWorkshop(workshopView);
           _loadData();
         }
       },
     );
   }
 
-  List<Widget> smallSubscriptions(
-      List<Subscription> subscriptions, Subscription? active) {
+  List<Widget> smallSubscriptions(WorkshopView workshopView) {
     List<Widget> smallSubscriptions = [];
-    for (Subscription subscription in subscriptions) {
-      smallSubscriptions
-          .add(smallSubscription(subscription, subscription.id == active?.id));
+    for (Subscription subscription in workshopView.workshop.subscriptions) {
+      smallSubscriptions.add(smallSubscription(workshopView, subscription));
     }
     return smallSubscriptions;
   }
 
-  Widget smallSubscription(Subscription subscription, bool active) {
+  Widget smallSubscription(
+      WorkshopView workshopView, Subscription subscription) {
     var numberColor = Colors.black.withOpacity(1.0);
     if ((subscription.lessonNumbers - subscription.lessons.length) <= 2) {
       numberColor = Colors.red;
@@ -279,7 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
       borderRadius: BorderRadius.circular(15.0),
     );
     var elevation = 2.0;
-    if (active) {
+    if (workshopView.active.id == subscription.id) {
       shape = RoundedRectangleBorder(
         side: const BorderSide(
           color: Colors.cyan,
@@ -291,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Card(
         child: GestureDetector(
             onTap: () {
-              setActive(subscription);
+              setActive(workshopView, subscription);
             },
             child: Row(
               children: [
@@ -311,4 +298,11 @@ class _MyHomePageState extends State<MyHomePage> {
         borderOnForeground: true,
         shape: shape);
   }
+}
+
+class WorkshopView {
+  Workshop workshop;
+  Subscription active;
+
+  WorkshopView(this.workshop, this.active);
 }
