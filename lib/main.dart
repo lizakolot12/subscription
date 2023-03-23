@@ -19,7 +19,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        //   primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorSchemeSeed: Colors.green,
       ),
       home: const MyHomePage(title: 'Абонементи'),
     );
@@ -37,8 +39,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final ListViewModel _listViewModel = ListViewModel(Repo());
 
-  void _openCreatePage() {
-    Navigator.of(context).push(_createRoute());
+  Future<void> _openCreatePage() async {
+    await Navigator.of(context)
+        .push(_createRoute())
+        .then((value) =>
+          setState(() {})
+    );
   }
 
   void setActive(WorkshopView workshopView, Subscription subscription) {
@@ -48,9 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _loadData() {
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   Route _createRoute() {
@@ -75,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var format = DateFormat("dd-MM-yyyy"); //.format(YOUR_DATETIME_HERE)
+    var format = DateFormat("dd-MM-yyyy");
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -160,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ]),
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(children: smallSubscriptions(item!)),
+                            child: Row(children: smallSubscriptions(item)),
                           ),
                         ],
                       ),

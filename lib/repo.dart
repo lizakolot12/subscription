@@ -6,6 +6,16 @@ import 'database/data.dart';
 import 'database/lessonEntity.dart';
 
 class Repo {
+  static final Repo _instance = Repo._internal();
+
+  factory Repo() {
+    return _instance;
+  }
+
+  Repo._internal() {
+    // initialization logic
+  }
+
   final databaseService = DatabaseService();
 
   Future<List<Workshop>> getAll() async {

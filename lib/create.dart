@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:subscription/repo.dart';
 
+import 'main.dart';
+
 class CreatePage extends StatefulWidget {
   const CreatePage({Key? key}) : super(key: key);
 
@@ -96,10 +98,13 @@ class _CreatePageState extends State<CreatePage> {
                           onSurface: Colors.pinkAccent),
                       onPressed: () {
                         var repo = Repo();
-                        repo.createWorkshop(
-                            _nameController.text,
-                            _labelController.text,
-                            int.parse(_numberController.text));
+                        var lessonsNumber = 0;
+                        try {
+                          lessonsNumber = int.parse(_numberController.text);
+                        } catch (e) {}
+                        repo.createWorkshop(_nameController.text,
+                            _labelController.text, lessonsNumber);
+                        _openMainPage();
                       },
                       child: Text('Зберегти'),
                     )
@@ -111,6 +116,30 @@ class _CreatePageState extends State<CreatePage> {
         },
       ).build(
           context), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  void _openMainPage() {
+    Navigator.of(context).pop("Update");
+  }
+
+  Route _mainRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const MyHomePage(title: 'Абонементи'),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
     );
   }
 }

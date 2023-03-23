@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
+import 'package:collection/collection.dart';
 
 import 'main.dart';
 
@@ -10,21 +12,35 @@ class ListViewModel {
   ListViewModel(this._repo);
 
   Future<List<WorkshopView>> getAll() async {
+    debugPrint("get all");
     var list = await _repo.getAll();
     if (_data == null) {
       _data = [];
       for (var i = 0; i < list.length; i++) {
         _data?.add(WorkshopView(list[i], list[i].subscriptions[0]));
       }
+      debugPrint("from data null ");
     } else {
-      var temporary = [];
-      for (var i = 0; i < list.length; i++) {
-        var current =
-            _data?.firstWhere((element) => element.workshop.id == list[i].id);
-        temporary.add(
-            WorkshopView(list[i], current?.active ?? list[i].subscriptions[0]));
+      var temporary = <WorkshopView>[];
+      try {
+        for (var i = 0; i < list.length; i++) {
+          debugPrint("i = " + i.toString());
+          WorkshopView? current =
+              _data?.firstWhereOrNull((m) => m.workshop.id == list[i].id);
+          debugPrint("!!!!!!!!!");
+          debugPrint(i.toString()+ " current = " + current.toString());
+           Subscription? c = current?.active;
+          debugPrint(i.toString()+ " sub = " +c.toString());
+          temporary.add(WorkshopView(
+              list[i], current?.active ?? list[i].subscriptions[0]));
+          debugPrint("added" + temporary.length.toString());
+        }
+        _data = temporary;
+      } catch (e) {
+        debugPrint(e.toString());
       }
-      _data = temporary.cast<WorkshopView>();
+      debugPrint("from exist ");
+      print(_data?.length);
     }
     return _data ?? List.empty();
   }
@@ -41,7 +57,10 @@ class ListViewModel {
   }
 
   void copy(WorkshopView workshopView) {
-    _repo.createSubscription(workshopView.active.workshopId, workshopView.active.detail + "_copy", workshopView.active.lessonNumbers);
+    _repo.createSubscription(
+        workshopView.active.workshopId,
+        workshopView.active.detail + "_copy",
+        workshopView.active.lessonNumbers);
   }
 
   void deleteWorkshop(WorkshopView workshopView) {
