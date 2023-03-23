@@ -19,7 +19,6 @@ class ListViewModel {
       for (var i = 0; i < list.length; i++) {
         _data?.add(WorkshopView(list[i], list[i].subscriptions[0]));
       }
-      debugPrint("from data null ");
     } else {
       var temporary = <WorkshopView>[];
       try {
@@ -27,19 +26,14 @@ class ListViewModel {
           debugPrint("i = " + i.toString());
           WorkshopView? current =
               _data?.firstWhereOrNull((m) => m.workshop.id == list[i].id);
-          debugPrint("!!!!!!!!!");
-          debugPrint(i.toString()+ " current = " + current.toString());
-           Subscription? c = current?.active;
-          debugPrint(i.toString()+ " sub = " +c.toString());
+          Subscription? c = current?.active;
           temporary.add(WorkshopView(
               list[i], current?.active ?? list[i].subscriptions[0]));
-          debugPrint("added" + temporary.length.toString());
         }
         _data = temporary;
       } catch (e) {
         debugPrint(e.toString());
       }
-      debugPrint("from exist ");
       print(_data?.length);
     }
     return _data ?? List.empty();
@@ -60,7 +54,9 @@ class ListViewModel {
     _repo.createSubscription(
         workshopView.active.workshopId,
         workshopView.active.detail + "_copy",
-        workshopView.active.lessonNumbers);
+        workshopView.active.lessonNumbers,
+        workshopView.active.startDate,
+        workshopView.active.endDate);
   }
 
   void deleteWorkshop(WorkshopView workshopView) {

@@ -24,7 +24,7 @@ class DatabaseService {
           "CREATE TABLE workshop(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL)",
         );
         await database.execute(
-          "CREATE TABLE subscription(id INTEGER PRIMARY KEY AUTOINCREMENT, detail TEXT NOT NULL, number INTEGER, workshopId INTEGER, "
+          "CREATE TABLE subscription(id INTEGER PRIMARY KEY AUTOINCREMENT, detail TEXT NOT NULL, number INTEGER, workshopId INTEGER, startDate TEXT, endDate TEXT, "
           "  FOREIGN KEY (workshopId) REFERENCES workshop (id) )",
         );
         await database.execute(
