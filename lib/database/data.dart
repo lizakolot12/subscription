@@ -76,6 +76,43 @@ class DatabaseService {
     return workshops;
   }
 
+  Future<Workshop> getBySubscriptionId(int id) async {
+    final Database db = await initializeDB();
+
+    final List<Map<String, dynamic>> subscription =
+        await db.query("subscription", where: "id =" + id.toString());
+    final List<Map<String, dynamic>> lesson =
+        await db.query("lesson", where: "subscriptionId = " + id.toString());
+
+    var lessonsEnt = List.generate(lesson.length, (i) {
+      return LessonEntity.fromMap(lesson[i]);
+    });
+
+    var lessons = lessonsEnt.map((e) => Lesson(e.lId, "", e.date)).toList();
+
+    var subscriptions = List.generate(subscription.length, (i) {
+      return SubscriptionEntity.fromMap(subscription[i]);
+    });
+
+    var subscriptionRes = subscriptions
+        .map((subEntity) => Subscription(
+            subEntity.id,
+            subEntity.detail,
+            subEntity.startDate,
+            subEntity.endDate,
+            subEntity.lessonNumbers,
+            lessons,
+            subEntity.workshopId))
+        .toList();
+
+    final List<Map<String, dynamic>> all = await db.query("workshop",
+        where: "id = " + subscriptionRes[0].workshopId.toString());
+    var workshops = List.generate(all.length, (i) {
+      return Workshop(all[i]["id"], all[i]["name"], subscriptionRes);
+    });
+    return workshops[0];
+  }
+
   Future<int> createItem(WorkshopEntity workshopEntity) async {
     final Database db = await initializeDB();
     final id = await db.insert('workshop', workshopEntity.toMap(),
@@ -105,6 +142,12 @@ class DatabaseService {
     final Database db = await initializeDB();
     final id = await db.insert('lesson', lessonEntity.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
+    return id;
+  }
+
+  Future<int>  updateWorkshop(int workshopId, String name) async {
+    final Database db = await initializeDB();
+    final id = await db.update('workshop', WorkshopEntity.Full(workshopId, name).toMap(), where: "id = " + workshopId.toString());
     return id;
   }
 }

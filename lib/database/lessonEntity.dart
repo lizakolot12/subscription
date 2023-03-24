@@ -1,4 +1,6 @@
 
+import '../model/lesson.dart';
+
 class LessonEntity {
   int lId = 0;
   DateTime date;

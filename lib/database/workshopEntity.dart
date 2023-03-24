@@ -4,6 +4,8 @@ class WorkshopEntity {
 
   WorkshopEntity(this.name);
 
+  WorkshopEntity.Full( this.id, this.name);
+
   WorkshopEntity.fromMap(Map<String, dynamic> item):
         id = item["id"],
         name = item["name"];

@@ -18,6 +18,11 @@ class Repo {
 
   final databaseService = DatabaseService();
 
+  Future<Workshop> getBySubscriptionId(int id) async {
+    var current = await databaseService.getBySubscriptionId(id);
+    return current;
+  }
+
   Future<List<Workshop>> getAll() async {
     var list = await databaseService.getAll();
     return list;
@@ -38,6 +43,10 @@ class Repo {
 
   void deleteWorkshop(int workshopId) {
     databaseService.deleteWorkshop(workshopId);
+  }
+
+  Future<int>  updateWorkshop(int workshopId, String name) {
+    return databaseService.updateWorkshop(workshopId, name);
   }
 
   void createLesson(int subscriptionId, DateTime date) {

@@ -5,6 +5,7 @@ import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
 import 'package:subscription/view_model.dart';
 
+import 'edit.dart';
 import 'model/workshop.dart';
 
 void main() {
@@ -39,12 +40,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final ListViewModel _listViewModel = ListViewModel(Repo());
 
+  Future<void> _openEditPage(int id) async {
+    await Navigator.of(context)
+        .push(_editRoute(id))
+        .then((value) => setState(() {}));
+  }
+
   Future<void> _openCreatePage() async {
     await Navigator.of(context)
         .push(_createRoute())
-        .then((value) =>
-          setState(() {})
-    );
+        .then((value) => setState(() {}));
   }
 
   void setActive(WorkshopView workshopView, Subscription subscription) {
@@ -57,10 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  Route _createRoute() {
+  Route _route(StatefulWidget widget) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          const CreatePage(),
+      pageBuilder: (context, animation, secondaryAnimation) => widget,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;
@@ -75,6 +79,14 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
+  }
+
+  Route _createRoute() {
+    return _route(const CreatePage());
+  }
+
+  Route _editRoute(int id) {
+    return _route(EditPage(id: id));
   }
 
   @override
@@ -103,8 +115,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                     var length = active?.lessons.length ?? 0;
                     var b = (active?.lessonNumbers ?? 0);
-                    debugPrint("--- length = " + length.toString() + "---" + b.toString());
+                    debugPrint("--- length = " +
+                        length.toString() +
+                        "---" +
+                        b.toString());
                     return Card(
+                        child: GestureDetector(
+                      onTap: () {
+                        debugPrint("must be open detail for " +
+                            (item?.active.id ?? 0).toString());
+                        _openEditPage(item?.active.id ?? -1);
+                      },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -171,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ],
                       ),
-                    );
+                    ));
                   },
                 ).build(context)
               : const Center(
