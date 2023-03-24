@@ -23,22 +23,24 @@ class Repo {
     return list;
   }
 
-  void createWorkshop(String name, String detail, int lessonNumber, DateTime startDate, DateTime endDate) {
+  void createWorkshop(String name, String detail, int lessonNumber,
+      DateTime startDate, DateTime endDate) {
     databaseService.createItem(WorkshopEntity(name)).then((value1) =>
-        databaseService.createSubscription(
-            SubscriptionEntity(detail, lessonNumber, value1, startDate, endDate)));
+        databaseService.createSubscription(SubscriptionEntity(
+            detail, lessonNumber, value1, startDate, endDate)));
   }
 
-  void createSubscription(int workshopId, String detail, int lessonNumber, DateTime startDate, DateTime endDate) {
-    databaseService.createSubscription(
-        SubscriptionEntity(detail, lessonNumber, workshopId, startDate, endDate));
+  void createSubscription(int workshopId, String detail, int lessonNumber,
+      DateTime startDate, DateTime endDate) {
+    databaseService.createSubscription(SubscriptionEntity(
+        detail, lessonNumber, workshopId, startDate, endDate));
   }
 
   void deleteWorkshop(int workshopId) {
     databaseService.deleteWorkshop(workshopId);
   }
 
-  void createLesson(int subscriptionId, String date) {
+  void createLesson(int subscriptionId, DateTime date) {
     databaseService.createLesson(LessonEntity(
       date,
       subscriptionId,

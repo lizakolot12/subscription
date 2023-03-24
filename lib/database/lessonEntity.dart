@@ -1,26 +1,17 @@
 
 class LessonEntity {
-    int lId = 0;
-/*    String description;*/
-    String date;
-    int subscriptionId;
+  int lId = 0;
+  DateTime date;
+  int subscriptionId;
 
-    LessonEntity(
-    //{
-       // required this.lId,
-        //required this.lId,
-        // this.description,
-       this.date, this.subscriptionId);
+  LessonEntity(this.date, this.subscriptionId);
 
-    LessonEntity.fromMap(Map<String, dynamic> item):
-            lId=item["id"],
-           // description= item["description"],
-            date = item["date"], subscriptionId = item["subscriptionId"];
+  LessonEntity.fromMap(Map<String, dynamic> item)
+      : lId = item["id"],
+        date = DateTime.parse(item["date"]),
+        subscriptionId = item["subscriptionId"];
 
-    Map<String, Object> toMap(){
-        return {
-            //'id':lId,
-           // 'description': description,
-            'date':date, 'subscriptionId':subscriptionId};
-    }
+  Map<String, Object> toMap() {
+    return {'date': date.toIso8601String(), 'subscriptionId': subscriptionId};
+  }
 }

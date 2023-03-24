@@ -101,6 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     if ((lessonPlan - lessonNow) <= 2) {
                       numberColor = Colors.red;
                     }
+                    var length = active?.lessons.length ?? 0;
+                    var b = (active?.lessonNumbers ?? 0);
+                    debugPrint("--- length = " + length.toString() + "---" + b.toString());
                     return Card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -4,13 +4,11 @@ class WorkshopEntity {
 
   WorkshopEntity(this.name);
 
-  WorkshopEntity.fromMap(Map<String, dynamic> item)
-      :
-        id=item["id"],
+  WorkshopEntity.fromMap(Map<String, dynamic> item):
+        id = item["id"],
         name = item["name"];
 
   Map<String, Object> toMap() {
     return {'name': name};
   }
 }
-

@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -37,7 +38,6 @@ class DatabaseService {
   }
 
   Future<List<Workshop>> getAll() async {
-    int result = 0;
     final Database db = await initializeDB();
     final List<Map<String, dynamic>> all = await db.query("workshop");
     final List<Map<String, dynamic>> subscription =
@@ -52,7 +52,7 @@ class DatabaseService {
     for (var e in lessons) {
       var cur = lessonMap[e.subscriptionId];
       cur ??= <Lesson>[];
-      cur.add(Lesson(e.lId, "description", DateTime.now()));
+      cur.add(Lesson(e.lId, "", e.date));
       lessonMap[e.subscriptionId] = cur;
     }
 
@@ -64,7 +64,7 @@ class DatabaseService {
     for (var e in subscriptions) {
       var cur = subscriptionMap[e.workshopId];
       cur ??= <Subscription>[];
-      cur.add(Subscription(e.id, e.detail, DateTime.now(), DateTime.now(),
+      cur.add(Subscription(e.id, e.detail, e.startDate, e.endDate,
           e.lessonNumbers, lessonMap[e.id] ?? List.empty(), e.workshopId));
       subscriptionMap[e.workshopId] = cur;
     }

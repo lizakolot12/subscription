@@ -12,7 +12,6 @@ class ListViewModel {
   ListViewModel(this._repo);
 
   Future<List<WorkshopView>> getAll() async {
-    debugPrint("get all");
     var list = await _repo.getAll();
     if (_data == null) {
       _data = [];
@@ -23,12 +22,16 @@ class ListViewModel {
       var temporary = <WorkshopView>[];
       try {
         for (var i = 0; i < list.length; i++) {
-          debugPrint("i = " + i.toString());
           WorkshopView? current =
               _data?.firstWhereOrNull((m) => m.workshop.id == list[i].id);
-          Subscription? c = current?.active;
-          temporary.add(WorkshopView(
-              list[i], current?.active ?? list[i].subscriptions[0]));
+          var active = list[i].subscriptions[0];
+          if (current?.active != null) {
+            active = list[i].subscriptions.firstWhereOrNull(
+                    (element) => element.id == current?.active.id) ??
+                list[i].subscriptions[0];
+          }
+
+          temporary.add(WorkshopView(list[i], active));
         }
         _data = temporary;
       } catch (e) {
@@ -47,7 +50,7 @@ class ListViewModel {
   }
 
   void addLesson(Subscription subscription) {
-    _repo.createLesson(subscription.id, DateTime.now().toString());
+    _repo.createLesson(subscription.id, DateTime.now());
   }
 
   void copy(WorkshopView workshopView) {
