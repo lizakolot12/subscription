@@ -145,9 +145,27 @@ class DatabaseService {
     return id;
   }
 
-  Future<int>  updateWorkshop(int workshopId, String name) async {
+  Future<int> updateWorkshop(int workshopId, String name) async {
     final Database db = await initializeDB();
-    final id = await db.update('workshop', WorkshopEntity.Full(workshopId, name).toMap(), where: "id = " + workshopId.toString());
+    final id = await db.update(
+        'workshop', WorkshopEntity.Full(workshopId, name).toMap(),
+        where: "id = " + workshopId.toString());
     return id;
+  }
+
+  Future<int> updateSubscriptionName(int id, String name) async {
+    final Database db = await initializeDB();
+    final res = await db.rawUpdate(
+        'UPDATE subscription SET detail = ?  WHERE id = ?',
+        [name, id.toString()]);
+    return res;
+  }
+
+  Future<int> updateLessonsNumber(int id, int number) async {
+    final Database db = await initializeDB();
+    final res = await db.rawUpdate(
+        'UPDATE subscription SET number = ?  WHERE id = ?',
+        [number.toString(), id.toString()]);
+    return res;
   }
 }

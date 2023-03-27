@@ -37,4 +37,13 @@ class EditViewModel {
   Future<int> editName(String text) {
     return  _repo.updateWorkshop(_current?.id ?? -1, text);
   }
+
+  Future<int> editLabel(String text) {
+    return  _repo.updateSubscriptionName(_current?.subscriptions[0].id ?? -1,  text);
+  }
+
+  Future<int> editLessonsNumber(String text) {
+    var lessonsNumber = int.parse(text);
+    return  _repo.updateLessonsNumber(_current?.subscriptions[0].id ?? -1,  lessonsNumber);
+  }
 }

@@ -49,10 +49,19 @@ class Repo {
     return databaseService.updateWorkshop(workshopId, name);
   }
 
+  Future<int>  updateSubscriptionName(int subscriptionId, String name) {
+    return databaseService.updateSubscriptionName(subscriptionId, name);
+  }
+
+  Future<int>  updateLessonsNumber(int subscriptionId, int number) {
+    return databaseService.updateLessonsNumber(subscriptionId, number);
+  }
+
   void createLesson(int subscriptionId, DateTime date) {
     databaseService.createLesson(LessonEntity(
       date,
       subscriptionId,
     ));
   }
+
 }

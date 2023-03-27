@@ -119,80 +119,81 @@ class _MyHomePageState extends State<MyHomePage> {
                         length.toString() +
                         "---" +
                         b.toString());
-                    return Card(
-                        child: GestureDetector(
-                      onTap: () {
-                        debugPrint("must be open detail for " +
-                            (item?.active.id ?? 0).toString());
-                        _openEditPage(item?.active.id ?? -1);
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 60,
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Text(item?.workshop.name ?? "",
-                                          textAlign: TextAlign.start)),
-                                ),
-                                Expanded(
-                                    flex: 30,
-                                    child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0, vertical: 8.0),
-                                        child: Text(
-                                            (active?.lessons.length ?? 0)
-                                                    .toString() +
-                                                " з " +
-                                                (active?.lessonNumbers ?? 0)
-                                                    .toString(),
-                                            style: TextStyle(
-                                                color: numberColor)))),
-                                Expanded(flex: 10, child: moreButton(item!))
+                    return InkWell(
+                        onTap: () {
+                          debugPrint("must be open detail for " +
+                              (item?.active.id ?? 0).toString());
+                          _openEditPage(item?.active.id ?? -1);
+                        },
+                        child: Card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      flex: 60,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Text(item?.workshop.name ?? "",
+                                              textAlign: TextAlign.start)),
+                                    ),
+                                    Expanded(
+                                        flex: 30,
+                                        child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0, vertical: 8.0),
+                                            child: Text(
+                                                (active?.lessons.length ?? 0)
+                                                        .toString() +
+                                                    " з " +
+                                                    (active?.lessonNumbers ?? 0)
+                                                        .toString(),
+                                                style: TextStyle(
+                                                    color: numberColor)))),
+                                    Expanded(flex: 10, child: moreButton(item!))
+                                  ]),
+                              Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 2.0),
+                                  child: Text(
+                                    active?.detail ?? "",
+                                    style: TextStyle(
+                                        color: Colors.grey[800],
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  )),
+                              Row(children: [
+                                const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text("з")),
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text(format.format(
+                                        active?.startDate ?? DateTime.now())))
                               ]),
-                          Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 2.0),
-                              child: Text(
-                                active?.detail ?? "",
-                                style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16),
-                              )),
-                          Row(children: [
-                            const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Text("з")),
-                            Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Text(format.format(
-                                    active?.startDate ?? DateTime.now())))
-                          ]),
-                          Row(children: [
-                            const Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16.0, vertical: 8.0),
-                                child: Text("по")),
-                            Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0, vertical: 8.0),
-                                child: Text(format
-                                    .format(active?.endDate ?? DateTime.now())))
-                          ]),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(children: smallSubscriptions(item)),
+                              Row(children: [
+                                const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    child: Text("по")),
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 8.0),
+                                    child: Text(format.format(
+                                        active?.endDate ?? DateTime.now())))
+                              ]),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(children: smallSubscriptions(item)),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ));
+                        ));
                   },
                 ).build(context)
               : const Center(

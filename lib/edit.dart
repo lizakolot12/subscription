@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:subscription/model/workshop.dart';
 import 'package:subscription/repo.dart';
@@ -56,8 +57,12 @@ class _EditPageState extends State<EditPage> {
             future: _editViewModel.getById(id),
             builder: (context, snapshot) {
               _nameController.text = snapshot.data?.name ?? '';
-              _labelController.text = snapshot.data?.subscriptions[0].detail ?? '';
-              _numberController.text = (snapshot.data?.subscriptions[0].lessonNumbers ?? 0 ).toString();
+              _labelController.text =
+                  snapshot.data?.subscriptions[0].detail ?? '';
+              _numberController.text =
+                  (snapshot.data?.subscriptions[0].lessonNumbers ?? 0)
+                      .toString();
+              print('Name: ${snapshot.data?.name ?? ''}');
               return Column(
                 children: [
                   Card(
@@ -67,33 +72,40 @@ class _EditPageState extends State<EditPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextField(
-                              onChanged: (text) async {
-                                print('First text field: $text');
-                                await _editViewModel.editName(text);
-                                setState(() {
-
-                                });
-                              },
+                            TextFormField(
                               controller: _nameController,
-                              decoration:  InputDecoration(
+                              onChanged: (text) async {
+                                debugPrint("change " + text);
+                                await _editViewModel.editName(text);
+                              },
+                              decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   labelText: 'Назва',
                                   hintText: 'Введіть назву'),
                             ),
-                            TextField(
+                            TextFormField(
                               controller: _labelController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   labelText: 'Мітка',
                                   hintText: 'Детальніше'),
+                              onChanged: (text) async {
+                                await _editViewModel.editLabel(text);
+                              },
                             ),
-                            TextField(
+                            TextFormField(
                               controller: _numberController,
-                              decoration: InputDecoration(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   labelText: 'Заплановано занять',
                                   hintText: '0'),
+                              onChanged: (text) async {
+                                await _editViewModel.editLessonsNumber(text);
+                              },
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(elevation: 2),
@@ -127,24 +139,6 @@ class _EditPageState extends State<EditPage> {
                               child: Text(
                                   'Дата кінця ${_formattedDate.format(snapshot.data?.subscriptions[0].endDate ?? DateTime.now())}'),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    var repo = Repo();
-                                    var lessonsNumber = 0;
-                                    try {
-                                      lessonsNumber =
-                                          int.parse(_numberController.text);
-                                    } catch (e) {}
-
-                                    _openMainPage();
-                                  },
-                                  child: const Text('Зберегти'),
-                                )
-                              ],
-                            )
                           ],
                         ),
                       ))
@@ -154,7 +148,6 @@ class _EditPageState extends State<EditPage> {
   }
 
   void _openMainPage() {
-    debugPrint("back!!!!!!!!!!!");
     Navigator.of(context).pop("Update");
   }
 }
