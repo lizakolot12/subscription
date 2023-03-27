@@ -57,6 +57,14 @@ class Repo {
     return databaseService.updateLessonsNumber(subscriptionId, number);
   }
 
+  Future<int>  updateStartDate(int subscriptionId, DateTime date) {
+    return databaseService.updateStartDate(subscriptionId, date);
+  }
+
+  Future<int>  updateEndDate(int subscriptionId, DateTime date) {
+    return databaseService.updateEndDate(subscriptionId, date);
+  }
+
   void createLesson(int subscriptionId, DateTime date) {
     databaseService.createLesson(LessonEntity(
       date,

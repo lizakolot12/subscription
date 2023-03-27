@@ -46,4 +46,12 @@ class EditViewModel {
     var lessonsNumber = int.parse(text);
     return  _repo.updateLessonsNumber(_current?.subscriptions[0].id ?? -1,  lessonsNumber);
   }
+
+  Future<int> editStartDate(DateTime date) {
+    return  _repo.updateStartDate(_current?.subscriptions[0].id ?? -1,  date);
+  }
+
+  Future<int> editEndDate(DateTime date) {
+    return  _repo.updateEndDate(_current?.subscriptions[0].id ?? -1,  date);
+  }
 }

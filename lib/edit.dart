@@ -25,21 +25,23 @@ class _EditPageState extends State<EditPage> {
 
   final DateFormat _formattedDate = DateFormat('dd.MM.yyyy');
 
-  /* DateTime? _startDate = DateTime.now();
-  DateTime? _endDate = DateTime.now();*/
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now();
   final _nameController = TextEditingController();
   final _labelController = TextEditingController();
   final _numberController = TextEditingController();
 
   void _setStartDate(DateTime? startDate) {
     setState(() {
-      //  _startDate = startDate;
+       _startDate = startDate ?? DateTime.now();
+       _editViewModel.editStartDate(_startDate);
     });
   }
 
   void _setEndDate(DateTime? endDate) {
     setState(() {
-      //_endDate = endDate;
+      _endDate = endDate ?? DateTime.now();
+      _editViewModel.editEndDate(_endDate);
     });
   }
 
@@ -62,7 +64,12 @@ class _EditPageState extends State<EditPage> {
               _numberController.text =
                   (snapshot.data?.subscriptions[0].lessonNumbers ?? 0)
                       .toString();
-              print('Name: ${snapshot.data?.name ?? ''}');
+              _startDate = snapshot
+                  .data?.subscriptions[0].startDate ??
+                  DateTime.now();
+              _endDate = snapshot
+                  .data?.subscriptions[0].endDate ??
+                  DateTime.now();
               return Column(
                 children: [
                   Card(
@@ -112,9 +119,7 @@ class _EditPageState extends State<EditPage> {
                               onPressed: () async {
                                 DateTime? pickedDate = await showDatePicker(
                                     context: context,
-                                    initialDate: snapshot
-                                            .data?.subscriptions[0].startDate ??
-                                        DateTime.now(),
+                                    initialDate: _startDate,
                                     //get today's date
                                     firstDate: DateTime(2000),
                                     //DateTime.now() - not to allow to choose before today.
@@ -122,22 +127,20 @@ class _EditPageState extends State<EditPage> {
                                 _setStartDate(pickedDate);
                               },
                               child: Text(
-                                  'Дата старту ${_formattedDate.format(snapshot.data?.subscriptions[0].startDate ?? DateTime.now())}'),
+                                  'Дата старту ${_formattedDate.format(_startDate)}'),
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(elevation: 2),
                               onPressed: () async {
                                 DateTime? pickedDate = await showDatePicker(
                                     context: context,
-                                    initialDate: snapshot
-                                            .data?.subscriptions[0].endDate ??
-                                        DateTime.now(),
+                                    initialDate: _endDate,
                                     firstDate: DateTime(2000),
                                     lastDate: DateTime(2101));
                                 _setEndDate(pickedDate);
                               },
                               child: Text(
-                                  'Дата кінця ${_formattedDate.format(snapshot.data?.subscriptions[0].endDate ?? DateTime.now())}'),
+                                  'Дата кінця ${_formattedDate.format(_endDate)}'),
                             ),
                           ],
                         ),

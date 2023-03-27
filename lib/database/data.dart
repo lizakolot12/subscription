@@ -168,4 +168,20 @@ class DatabaseService {
         [number.toString(), id.toString()]);
     return res;
   }
+
+  Future<int> updateStartDate(int id, DateTime date) async {
+    final Database db = await initializeDB();
+    final res = await db.rawUpdate(
+        'UPDATE subscription SET startDate = ?  WHERE id = ?',
+        [date.toIso8601String(), id.toString()]);
+    return res;
+  }
+
+  Future<int> updateEndDate(int id, DateTime date) async {
+    final Database db = await initializeDB();
+    final res = await db.rawUpdate(
+        'UPDATE subscription SET endDate = ?  WHERE id = ?',
+        [date.toIso8601String(), id.toString()]);
+    return res;
+  }
 }
