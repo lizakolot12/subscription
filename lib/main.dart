@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:subscription/create.dart';
+import 'package:subscription/model/lesson.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
 import 'package:subscription/view_model.dart';
@@ -113,16 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     if ((lessonPlan - lessonNow) <= 2) {
                       numberColor = Colors.red;
                     }
-                    var length = active?.lessons.length ?? 0;
-                    var b = (active?.lessonNumbers ?? 0);
-                    debugPrint("--- length = " +
-                        length.toString() +
-                        "---" +
-                        b.toString());
                     return InkWell(
                         onTap: () {
-                          debugPrint("must be open detail for " +
-                              (item?.active.id ?? 0).toString());
                           _openEditPage(item?.active.id ?? -1);
                         },
                         child: Card(
@@ -187,6 +180,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: Text(format.format(
                                         active?.endDate ?? DateTime.now())))
                               ]),
+                              Container(
+                                child: _lessons(active?.lessons),
+                              ),
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(children: smallSubscriptions(item)),
@@ -347,6 +343,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return Card(
         child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTapDown: (details) => _getTapPosition(details),
             onLongPress: () {
               _showContextMenu(context, subscription);
@@ -403,6 +400,40 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ))
         ]);
+  }
+
+  Widget _lessons(List<Lesson>? lessons) {
+    if (lessons == null || lessons.isEmpty) {
+      return const Text("");
+    }
+    var format = DateFormat("dd.MM");
+    var shape = RoundedRectangleBorder(
+      side: const BorderSide(
+        color: Colors.teal,
+      ),
+      borderRadius: BorderRadius.circular(24.0),
+    );
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const ScrollPhysics(),
+      itemCount: lessons.length,
+      // The length Of the array
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, childAspectRatio: (1 / .4)),
+      // The size of the grid box
+      itemBuilder: (context, index) => Card(
+          color: Colors.lightBlueAccent.withOpacity(0.3),
+          child: GestureDetector(
+            onLongPress: () {},
+            onTap: () {},
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Text(format.format(lessons[index].date))),
+          ),
+          elevation: 2,
+          borderOnForeground: true,
+          shape: shape),
+    );
   }
 }
 
