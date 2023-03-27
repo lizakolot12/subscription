@@ -138,6 +138,16 @@ class DatabaseService {
     return id;
   }
 
+  Future<int> deleteSubscription(int id) async {
+    final Database db = await initializeDB();
+    final res = await db.delete(
+      'subscription',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return res;
+  }
+
   Future<int> createLesson(LessonEntity lessonEntity) async {
     final Database db = await initializeDB();
     final id = await db.insert('lesson', lessonEntity.toMap(),

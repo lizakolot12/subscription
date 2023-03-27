@@ -65,4 +65,8 @@ class ListViewModel {
   void deleteWorkshop(WorkshopView workshopView) {
     _repo.deleteWorkshop(workshopView.workshop.id);
   }
+
+  void deleteSubscription(Subscription subscription) {
+    _repo.deleteSubscription(subscription.id);
+  }
 }

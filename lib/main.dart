@@ -203,9 +203,50 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreatePage,
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Offset _tapPosition = Offset.zero;
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  Widget _popupSubscription(Subscription subscription) {
+    return PopupMenuButton<int>(
+      itemBuilder: (context) => [
+        // PopupMenuItem 1
+        PopupMenuItem(
+          value: 1,
+          // row with 2 children
+          child: Row(
+            children: const [
+              Icon(Icons.delete),
+              SizedBox(
+                width: 10,
+              ),
+              Text("Видалити")
+            ],
+          ),
+        ),
+        // PopupMenuItem 2
+      ],
+      offset: const Offset(0, 100),
+      color: Colors.grey,
+      elevation: 2,
+      // on selected we show the dialog box
+      onSelected: (value) {
+        // if value 1 show dialog
+        if (value == 1) {
+          _listViewModel.deleteSubscription(subscription);
+          _loadData();
+        }
+      },
     );
   }
 
@@ -306,6 +347,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     return Card(
         child: GestureDetector(
+            onTapDown: (details) => _getTapPosition(details),
+            onLongPress: () {
+              _showContextMenu(context, subscription);
+            },
             onTap: () {
               setActive(workshopView, subscription);
             },
@@ -326,6 +371,38 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: elevation,
         borderOnForeground: true,
         shape: shape);
+  }
+
+  void _showContextMenu(BuildContext context, Subscription subscription) async {
+    final RenderObject? overlay =
+        Overlay.of(context).context.findRenderObject();
+    final result = await showMenu(
+        context: context,
+
+        // Position the context menu
+        // It should be placed near the long press location
+        position: RelativeRect.fromRect(
+            Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+            Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+                overlay.paintBounds.size.height)),
+
+        // set a list of choices for the context menu
+        items: [
+          PopupMenuItem(
+              onTap: () {
+                _listViewModel.deleteSubscription(subscription);
+                _loadData();
+              },
+              child: Row(
+                children: const [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text("Видалити")
+                ],
+              ))
+        ]);
   }
 }
 

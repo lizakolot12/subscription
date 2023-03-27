@@ -45,6 +45,10 @@ class Repo {
     databaseService.deleteWorkshop(workshopId);
   }
 
+  void deleteSubscription(int subscriptionId) {
+    databaseService.deleteSubscription(subscriptionId);
+  }
+
   Future<int>  updateWorkshop(int workshopId, String name) {
     return databaseService.updateWorkshop(workshopId, name);
   }
