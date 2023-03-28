@@ -370,36 +370,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _lessons(List<Lesson>? lessons) {
+
     if (lessons == null || lessons.isEmpty) {
       return const Text("");
     }
     var format = DateFormat("dd.MM");
     var shape = RoundedRectangleBorder(
-      side: const BorderSide(
-        color: Colors.teal,
-      ),
       borderRadius: BorderRadius.circular(24.0),
     );
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const ScrollPhysics(),
-      itemCount: lessons.length,
-      // The length Of the array
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, childAspectRatio: (1 / .4)),
-      // The size of the grid box
-      itemBuilder: (context, index) => Card(
-          color: Colors.lightBlueAccent.withOpacity(0.3),
-          child: GestureDetector(
-            onLongPress: () {},
-            onTap: () {},
-            child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(format.format(lessons[index].date))),
-          ),
-          elevation: 2,
-          borderOnForeground: true,
-          shape: shape),
+    return Wrap(
+      direction: Axis.horizontal,
+      children: [
+        for (var i in lessons)
+          Card(
+              color: Colors.black12,
+              child: GestureDetector(
+                onLongPress: () {},
+                onTap: () {},
+                child: Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Text(format.format(i.date),
+                      textAlign:  TextAlign.center),
+                ),
+              ),
+              borderOnForeground: true,
+              shape: shape),
+      ],
     );
   }
 }
