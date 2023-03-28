@@ -213,39 +213,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Widget _popupSubscription(Subscription subscription) {
-    return PopupMenuButton<int>(
-      itemBuilder: (context) => [
-        // PopupMenuItem 1
-        PopupMenuItem(
-          value: 1,
-          // row with 2 children
-          child: Row(
-            children: const [
-              Icon(Icons.delete),
-              SizedBox(
-                width: 10,
-              ),
-              Text("Видалити")
-            ],
-          ),
-        ),
-        // PopupMenuItem 2
-      ],
-      offset: const Offset(0, 100),
-      color: Colors.grey,
-      elevation: 2,
-      // on selected we show the dialog box
-      onSelected: (value) {
-        // if value 1 show dialog
-        if (value == 1) {
-          _listViewModel.deleteSubscription(subscription);
-          _loadData();
-        }
-      },
-    );
-  }
-
   Widget moreButton(WorkshopView workshopView) {
     return PopupMenuButton<int>(
       itemBuilder: (context) => [

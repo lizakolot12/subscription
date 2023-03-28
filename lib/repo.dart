@@ -4,6 +4,7 @@ import 'package:subscription/model/workshop.dart';
 
 import 'database/data.dart';
 import 'database/lessonEntity.dart';
+import 'model/lesson.dart';
 
 class Repo {
   static final Repo _instance = Repo._internal();
@@ -67,6 +68,14 @@ class Repo {
 
   Future<int>  updateEndDate(int subscriptionId, DateTime date) {
     return databaseService.updateEndDate(subscriptionId, date);
+  }
+
+  Future<int>  updateLessonDate(int lessonId, DateTime date) {
+    return databaseService.updateLessonsDate(lessonId, date);
+  }
+
+  Future<int>  deleteLesson(Lesson lesson) {
+    return databaseService.deleteLesson(lesson.lId);
   }
 
   void createLesson(int subscriptionId, DateTime date) {

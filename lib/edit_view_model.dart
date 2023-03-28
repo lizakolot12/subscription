@@ -5,6 +5,7 @@ import 'package:subscription/repo.dart';
 import 'package:collection/collection.dart';
 
 import 'main.dart';
+import 'model/lesson.dart';
 
 class EditViewModel {
   final Repo _repo;
@@ -19,6 +20,14 @@ class EditViewModel {
 
   void addLesson(Subscription subscription) {
     _repo.createLesson(subscription.id, DateTime.now());
+  }
+
+  void updateLessonDate(Lesson lesson, DateTime? date) {
+    _repo.updateLessonDate(lesson.lId, date ?? DateTime.now());
+  }
+
+  void deleteLesson(Lesson lesson) {
+    _repo.deleteLesson(lesson);
   }
 
   void copy(WorkshopView workshopView) {

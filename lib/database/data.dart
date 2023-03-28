@@ -138,6 +138,16 @@ class DatabaseService {
     return id;
   }
 
+  Future<int> deleteLesson(int lessonId) async {
+    final Database db = await initializeDB();
+    final id = await db.delete(
+      'lesson',
+      where: 'id = ?',
+      whereArgs: [lessonId],
+    );
+    return id;
+  }
+
   Future<int> deleteSubscription(int id) async {
     final Database db = await initializeDB();
     final res = await db.delete(
@@ -183,6 +193,14 @@ class DatabaseService {
     final Database db = await initializeDB();
     final res = await db.rawUpdate(
         'UPDATE subscription SET startDate = ?  WHERE id = ?',
+        [date.toIso8601String(), id.toString()]);
+    return res;
+  }
+
+  Future<int> updateLessonsDate(int id, DateTime date) async {
+    final Database db = await initializeDB();
+    final res = await db.rawUpdate(
+        'UPDATE lesson SET date = ?  WHERE id = ?',
         [date.toIso8601String(), id.toString()]);
     return res;
   }
