@@ -195,18 +195,22 @@ class _MyHomePageState extends State<MyHomePage> {
             ).build(context);
           } else {
             print("ELSE");
-            return Center(child:SizedBox(
-
-              child: TextLiquidFill(
-                text: 'Створи абонемент',
-                textAlign: TextAlign.center,
-                waveColor: Colors.blueAccent,
-                boxBackgroundColor: Colors.lightGreen.shade50,
-                textStyle: TextStyle(
-                  fontSize: 56.0,
-                  fontWeight: FontWeight.bold,
+            return Center(
+                child: AnimatedTextKit(
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  'Створи абонемент!',
+                  textStyle: const TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  speed: const Duration(milliseconds: 100),
                 ),
-              ),
+              ],
+              totalRepeatCount: 4,
+              pause: const Duration(milliseconds: 500),
+              displayFullTextOnTap: true,
+              stopPauseOnTap: true,
             ));
           }
         },
