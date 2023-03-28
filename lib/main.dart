@@ -5,7 +5,7 @@ import 'package:subscription/model/lesson.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
 import 'package:subscription/view_model.dart';
-import 'package:rive/rive.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 import 'edit.dart';
 import 'model/workshop.dart';
@@ -195,7 +195,19 @@ class _MyHomePageState extends State<MyHomePage> {
             ).build(context);
           } else {
             print("ELSE");
-            return RiveAnimation.asset('assets/can_go_next.riv');
+            return Center(child:SizedBox(
+
+              child: TextLiquidFill(
+                text: 'Створи абонемент',
+                textAlign: TextAlign.center,
+                waveColor: Colors.blueAccent,
+                boxBackgroundColor: Colors.lightGreen.shade50,
+                textStyle: TextStyle(
+                  fontSize: 56.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ));
           }
         },
       ),
