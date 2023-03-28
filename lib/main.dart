@@ -5,6 +5,7 @@ import 'package:subscription/model/lesson.dart';
 import 'package:subscription/model/subscription.dart';
 import 'package:subscription/repo.dart';
 import 'package:subscription/view_model.dart';
+import 'package:rive/rive.dart';
 
 import 'edit.dart';
 import 'model/workshop.dart';
@@ -99,102 +100,103 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: FutureBuilder<List<WorkshopView>>(
+        initialData: const [],
         future: _listViewModel.getAll(),
-        initialData: List.empty(),
         builder: (context, snapshot) {
-          return snapshot.hasData
-              ? ListView.builder(
-                  itemCount: snapshot.data?.length,
-                  itemBuilder: (context, index) {
-                    var item = snapshot.data?.toList()[index];
-                    var active = item?.active;
-                    var lessonNow = active?.lessons.length ?? 0;
-                    var lessonPlan = active?.lessonNumbers ?? 0;
-                    var numberColor = Colors.black.withOpacity(1.0);
-                    if ((lessonPlan - lessonNow) <= 2) {
-                      numberColor = Colors.red;
-                    }
-                    return InkWell(
-                        onTap: () {
-                          _openEditPage(item?.active.id ?? -1);
-                        },
-                        child: Card(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      flex: 60,
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Text(item?.workshop.name ?? "",
-                                              textAlign: TextAlign.start)),
-                                    ),
-                                    Expanded(
-                                        flex: 30,
-                                        child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 8.0, vertical: 8.0),
-                                            child: Text(
-                                                (active?.lessons.length ?? 0)
-                                                        .toString() +
-                                                    " з " +
-                                                    (active?.lessonNumbers ?? 0)
-                                                        .toString(),
-                                                style: TextStyle(
-                                                    color: numberColor)))),
-                                    Expanded(flex: 10, child: moreButton(item!))
-                                  ]),
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0, vertical: 2.0),
-                                  child: Text(
-                                    active?.detail ?? "",
-                                    style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  )),
-                              Row(children: [
-                                const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text("з")),
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text(format.format(
-                                        active?.startDate ?? DateTime.now())))
+          if ((snapshot.data?.length ?? 0) > 0) {
+            print("has data");
+            return ListView.builder(
+              itemCount: snapshot.data?.length,
+              itemBuilder: (context, index) {
+                var item = snapshot.data?.toList()[index];
+                var active = item?.active;
+                var lessonNow = active?.lessons.length ?? 0;
+                var lessonPlan = active?.lessonNumbers ?? 0;
+                var numberColor = Colors.black.withOpacity(1.0);
+                if ((lessonPlan - lessonNow) <= 2) {
+                  numberColor = Colors.red;
+                }
+                return InkWell(
+                    onTap: () {
+                      _openEditPage(item?.active.id ?? -1);
+                    },
+                    child: Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 60,
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Text(item?.workshop.name ?? "",
+                                          textAlign: TextAlign.start)),
+                                ),
+                                Expanded(
+                                    flex: 30,
+                                    child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 8.0),
+                                        child: Text(
+                                            (active?.lessons.length ?? 0)
+                                                    .toString() +
+                                                " з " +
+                                                (active?.lessonNumbers ?? 0)
+                                                    .toString(),
+                                            style: TextStyle(
+                                                color: numberColor)))),
+                                Expanded(flex: 10, child: moreButton(item!))
                               ]),
-                              Row(children: [
-                                const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16.0, vertical: 8.0),
-                                    child: Text("по")),
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0, vertical: 8.0),
-                                    child: Text(format.format(
-                                        active?.endDate ?? DateTime.now())))
-                              ]),
-                              Container(
-                                child: _lessons(active?.lessons),
-                              ),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(children: smallSubscriptions(item)),
-                              ),
-                            ],
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 2.0),
+                              child: Text(
+                                active?.detail ?? "",
+                                style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16),
+                              )),
+                          Row(children: [
+                            const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text("з")),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text(format.format(
+                                    active?.startDate ?? DateTime.now())))
+                          ]),
+                          Row(children: [
+                            const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Text("по")),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 8.0),
+                                child: Text(format
+                                    .format(active?.endDate ?? DateTime.now())))
+                          ]),
+                          Container(
+                            child: _lessons(active?.lessons),
                           ),
-                        ));
-                  },
-                ).build(context)
-              : const Center(
-                  child: CircularProgressIndicator(),
-                );
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(children: smallSubscriptions(item)),
+                          ),
+                        ],
+                      ),
+                    ));
+              },
+            ).build(context);
+          } else {
+            print("ELSE");
+            return RiveAnimation.asset('assets/can_go_next.riv');
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -370,7 +372,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _lessons(List<Lesson>? lessons) {
-
     if (lessons == null || lessons.isEmpty) {
       return const Text("");
     }
@@ -388,10 +389,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 onLongPress: () {},
                 onTap: () {},
                 child: Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Text(format.format(i.date),
-                      textAlign:  TextAlign.center),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child:
+                      Text(format.format(i.date), textAlign: TextAlign.center),
                 ),
               ),
               borderOnForeground: true,

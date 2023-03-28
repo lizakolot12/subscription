@@ -133,18 +133,30 @@ class _EditPageState extends State<EditPage> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Відвідані заняття'),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          tooltip: 'Відвідано заняття',
-                          onPressed: () {
-                            var sub = snapshot.data?.subscriptions[0];
-                            if (sub != null) {
-                              _editViewModel.addLesson(sub);
-                              setState(() {});
-                            }
-                          },
-                        )
+                        Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, bottom: 16.0, top: 32),
+                            child: Text(
+                              'Відвідані заняття',
+                              style: TextStyle(
+                                color: Colors.lightGreen.shade900,
+                                fontSize: 18,
+                              ),
+                            )),
+                        Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, bottom: 16.0, top: 32),
+                            child: IconButton(
+                              icon: const Icon(Icons.add),
+                              tooltip: 'Відвідано заняття',
+                              onPressed: () {
+                                var sub = snapshot.data?.subscriptions[0];
+                                if (sub != null) {
+                                  _editViewModel.addLesson(sub);
+                                  setState(() {});
+                                }
+                              },
+                            ))
                       ]),
                   _lessons(snapshot.data)
                 ],
@@ -160,7 +172,7 @@ class _EditPageState extends State<EditPage> {
     var format = DateFormat("dd.MM");
     var shape = RoundedRectangleBorder(
       side: const BorderSide(
-        color: Colors.blueAccent,
+        color: Colors.black12,
       ),
       borderRadius: BorderRadius.circular(4.0),
     );
@@ -170,41 +182,35 @@ class _EditPageState extends State<EditPage> {
       // The length Of the array
 
       itemBuilder: (context, index) => Card(
-          color: Colors.lightBlueAccent.withOpacity(0.3),
-          child: GestureDetector(
-              onLongPress: () {},
-              onTap: () {},
-              child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                            child: Text(
-                              format.format(lessons[index].date)
-                            ),
-                            onTap: () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: lessons[index].date,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2101));
-                              setState(() {
-                                _editViewModel.updateLessonDate(
-                                    lessons[index], pickedDate);
-                              });
-                            }),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          tooltip: 'Видалити',
-                          onPressed: () {
-                            setState(() {
-                              _editViewModel.deleteLesson(lessons[index]);
-                            });
-                          },
-                        )
-                      ]))),
+          child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                        child: Text(format.format(lessons[index].date)),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: lessons[index].date,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101));
+                          setState(() {
+                            _editViewModel.updateLessonDate(
+                                lessons[index], pickedDate);
+                          });
+                        }),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      tooltip: 'Видалити',
+                      onPressed: () {
+                        setState(() {
+                          _editViewModel.deleteLesson(lessons[index]);
+                        });
+                      },
+                    )
+                  ])),
           elevation: 2,
           borderOnForeground: true,
           shape: shape),
